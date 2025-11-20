@@ -21,8 +21,11 @@ class LoginController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
-        
-        if ($this->authService->login($credentials, $request->remember)) {
+
+        $remember = $request->boolean('remember', false);
+
+        if ($this->authService->login($credentials, $remember)) {
+
             $user = $this->authService->getAuthenticatedUser();
             return $this->authenticated($request, $user);
         }
@@ -34,10 +37,20 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        return match($user->role) {
+        \Log::info('LoginController redirecting user', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
+            'intended_route' => match ($user->role) {
+                'admin' => 'admin.dashboard',
+                'vendor' => 'vendor.dashboard',
+                default => 'customer.dashboard',
+            },
+        ]);
+
+        return match ($user->role) {
             'admin' => redirect()->route('admin.dashboard'),
             'vendor' => redirect()->route('vendor.dashboard'),
-            default => redirect()->route('dashboard'),
+            default => redirect()->route('customer.dashboard'),
         };
     }
 

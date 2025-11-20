@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class Product extends BaseModel
 {
     use HasFactory;
 
@@ -22,7 +22,7 @@ class Product extends Model
     // Relationships
     public function vendor()
     {
-        return $this->belongsTo(VendorProfile::class);
+        return $this->belongsTo(VendorProfile::class, 'vendor_id');
     }
 
     public function category()

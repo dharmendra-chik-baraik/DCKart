@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VendorProfile extends Model
+class VendorProfile extends BaseModel
 {
     use HasFactory;
 
@@ -24,7 +23,7 @@ class VendorProfile extends Model
         'verified_at' => 'datetime',
     ];
 
-    // Relationships
+    // Relationships - FIXED with correct foreign keys
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -32,7 +31,7 @@ class VendorProfile extends Model
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class, 'vendor_id');
     }
 
     public function payouts()
@@ -42,17 +41,17 @@ class VendorProfile extends Model
 
     public function orders()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class, 'vendor_id'); // ADDED foreign key
     }
 
     public function orderItems()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class, 'vendor_id');
     }
 
     public function tickets()
     {
-        return $this->hasMany(Ticket::class);
+        return $this->hasMany(Ticket::class, 'vendor_id');
     }
 
     // Scopes
@@ -64,5 +63,26 @@ class VendorProfile extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'approved');
+    }
+
+    // Accessors for stats
+    public function getTotalProductsAttribute()
+    {
+        return $this->products()->count();
+    }
+
+    public function getTotalOrdersAttribute()
+    {
+        return $this->orders()->count();
+    }
+
+    public function getTotalRevenueAttribute()
+    {
+        return $this->orders()->where('order_status', 'delivered')->sum('grand_total');
+    }
+
+    public function getPendingOrdersAttribute()
+    {
+        return $this->orders()->where('order_status', 'pending')->count();
     }
 }

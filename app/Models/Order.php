@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
+class Order extends BaseModel
 {
     use HasFactory;
 
@@ -27,7 +27,7 @@ class Order extends Model
 
     public function vendor()
     {
-        return $this->belongsTo(VendorProfile::class);
+        return $this->belongsTo(VendorProfile::class, 'vendor_id');
     }
 
     public function items()

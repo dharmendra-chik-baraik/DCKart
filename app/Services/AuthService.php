@@ -9,6 +9,7 @@ class AuthService implements AuthServiceInterface
 {
     public function login(array $credentials, bool $remember = false): bool
     {
+        
         return Auth::attempt($credentials, $remember);
     }
 

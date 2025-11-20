@@ -10,28 +10,50 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            // Register additional route files
-            Route::middleware('web')
-                ->group(base_path('routes/admin.php'));
-                
-            Route::middleware('web')
-                ->group(base_path('routes/customer.php'));
-                
-            Route::middleware('web')
-                ->group(base_path('routes/vendor.php'));
-                
+            // Public routes first
             Route::middleware('web')
                 ->group(base_path('routes/auth.php'));
+
+            // Default home route
+            Route::middleware('web')
+                ->get('/', function () {
+                    if (auth()->check()) {
+                        $user = auth()->user();
+                        return match($user->role) {
+                            'admin' => redirect()->route('admin.dashboard'),
+                            'vendor' => redirect()->route('vendor.dashboard'),
+                            'customer' => redirect()->route('customer.dashboard'),
+                            default => view('home'),
+                        };
+                    }
+                    return view('home');
+                })->name('home');
+
+            // Protected role-based routes
+            Route::middleware(['web', 'auth', 'admin'])
+                ->prefix('admin')
+                ->name('admin.')
+                ->group(base_path('routes/admin.php'));
+
+            Route::middleware(['web', 'auth', 'vendor'])
+                ->prefix('vendor')
+                ->name('vendor.')
+                ->group(base_path('routes/vendor.php'));
+
+            Route::middleware(['web', 'auth', 'customer'])
+                ->prefix('customer')
+                ->name('customer.')
+                ->group(base_path('routes/customer.php'));
         }
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        // Register your custom middleware aliases
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'customer' => \App\Http\Middleware\CustomerMiddleware::class,
-            'vendor' => \App\Http\Middleware\VendorMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'vendor' => \App\Http\Middleware\VendorMiddleware::class,
+            'customer' => \App\Http\Middleware\CustomerMiddleware::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->create();
