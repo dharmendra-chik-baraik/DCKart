@@ -17,7 +17,7 @@
         <!-- Statistics Cards -->
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card border-left-primary shadow-sm h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
+                <div class="card border-left-success shadow-sm h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card border-left-warning shadow-sm h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card border-left-danger shadow-sm h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
@@ -83,7 +83,7 @@
         </div>
 
         <!-- Filters Card -->
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm-sm mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Filters</h6>
             </div>
@@ -137,7 +137,7 @@
         </div>
 
         <!-- Orders Table -->
-        <div class="card shadow-sm">
+        <div class="card shadow-sm-sm">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">Orders List</h6>
                 <span class="badge bg-primary">Total: {{ $orders->total() }}</span>
@@ -180,12 +180,12 @@
                                     <td>{{ $order->vendor->business_name ?? 'N/A' }}</td>
                                     <td>${{ number_format($order->grand_total, 2) }}</td>
                                     <td>
-                                        <span class="badge badge-{{ getOrderStatusBadge($order->order_status) }}">
+                                        <span class="badge bg-{{ getOrderStatusBadge($order->order_status) }}">
                                             {{ ucfirst($order->order_status) }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge badge-{{ getPaymentStatusBadge($order->payment_status) }}">
+                                        <span class="badge bg-{{ getPaymentStatusBadge($order->payment_status) }}">
                                             {{ ucfirst($order->payment_status) }}
                                         </span>
                                     </td>
@@ -360,91 +360,141 @@
         .badge-payment-refunded { background-color: #6c757d; color: #fff; }
     </style>
 @endpush
-
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Update Status Modal
-        const updateStatusButtons = document.querySelectorAll('.update-status-btn');
-        const updateStatusModal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
-        const updateStatusForm = document.getElementById('updateStatusForm');
-        
-        updateStatusButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const orderId = this.getAttribute('data-order-id');
-                const currentStatus = this.getAttribute('data-current-status');
-                
-                document.getElementById('orderId').value = orderId;
-                document.getElementById('status').value = currentStatus;
-                
-                updateStatusForm.action = `/admin/orders/${orderId}/status`;
-                updateStatusModal.show();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update Status Modal
+            const updateStatusButtons = document.querySelectorAll('.update-status-btn');
+            const updateStatusModal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+            const updateStatusForm = document.getElementById('updateStatusForm');
+
+            base_url = '{{ url('/') }}';
+            console.log(base_url);
+
+            updateStatusButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    const currentStatus = this.getAttribute('data-current-status');
+
+                    document.getElementById('orderId').value = orderId;
+                    document.getElementById('status').value = currentStatus;
+
+                    updateStatusForm.action = base_url + `/admin/orders/${orderId}/status`;
+                    updateStatusModal.show();
+                });
             });
-        });
 
-        // Cancel Order Modal
-        const cancelOrderButtons = document.querySelectorAll('.cancel-order-btn');
-        const cancelOrderModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
-        const cancelOrderForm = document.getElementById('cancelOrderForm');
-        
-        cancelOrderButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const orderId = this.getAttribute('data-order-id');
-                
-                document.getElementById('cancelOrderId').value = orderId;
-                cancelOrderForm.action = `/admin/orders/${orderId}/cancel`;
-                cancelOrderModal.show();
+            // Cancel Order Modal
+            const cancelOrderButtons = document.querySelectorAll('.cancel-order-btn');
+            const cancelOrderModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+            const cancelOrderForm = document.getElementById('cancelOrderForm');
+
+            cancelOrderButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+
+                    document.getElementById('cancelOrderId').value = orderId;
+                    cancelOrderForm.action = base_url + `/admin/orders/${orderId}/cancel`;
+                    cancelOrderModal.show();
+                });
             });
-        });
 
-        // Form Submissions
-        updateStatusForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitForm(this);
-        });
+            // Form Submissions
+            updateStatusForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForm(this);
+            });
 
-        cancelOrderForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitForm(this);
-        });
+            cancelOrderForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForm(this);
+            });
 
-        function submitForm(form) {
-            const formData = new FormData(form);
-            
-            fetch(form.action, {
-                method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showAlert('success', data.message);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    showAlert('error', data.message);
+            function submitForm(form) {
+                const formData = new FormData(form);
+
+                // Add _method field for PUT requests
+                formData.append('_method', 'PUT');
+
+                // Clear any existing alerts before new submission
+                const modalBody = document.querySelector('.modal .modal-body');
+                if (modalBody) {
+                    const existingAlerts = modalBody.querySelectorAll('.alert');
+                    existingAlerts.forEach(alert => alert.remove());
                 }
-            })
-            .catch(error => {
-                showAlert('error', 'An error occurred. Please try again.');
-            });
-        }
 
-        function showAlert(type, message) {
-            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-            const alertHtml = `
-                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alertHtml);
-        }
-    });
-</script>
+                fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(errorData.message || 'Request failed');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            showAlert('success', data.message);
+                        } else {
+                            showAlert('error', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showAlert('error', error.message || 'An error occurred. Please try again.');
+                    });
+            }
+
+            function showAlert(type, message) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+
+                const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            <i class="fas ${icon} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+
+                const modalBody = document.querySelector('.modal .modal-body');
+                if (modalBody) {
+                    // Remove any existing alerts first
+                    const existingAlerts = modalBody.querySelectorAll('.alert');
+                    existingAlerts.forEach(alert => alert.remove());
+
+                    // Insert new alert at the top of modal body
+                    modalBody.insertAdjacentHTML('afterbegin', alertHtml);
+
+                    // Auto-remove success alerts after 3 seconds
+                    if (type === 'success') {
+                        setTimeout(() => {
+                            const alert = modalBody.querySelector('.alert');
+                            if (alert) {
+                                alert.remove();
+                            }
+                            // Close modal and reload page after success
+                            const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
+                            if (modal) {
+                                modal.hide();
+                            }
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        }, 2000);
+                    }
+                } else {
+                    document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alertHtml);
+                }
+            }
+        });
+    </script>
 @endpush

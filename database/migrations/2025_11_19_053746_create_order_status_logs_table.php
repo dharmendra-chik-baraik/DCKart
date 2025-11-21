@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('changed_by'); // user_id or system
             $table->text('note')->nullable();
             $table->timestamp('created_at');
+            $table->timestamp('updated_at');
 
             $table->index('order_id');
         });

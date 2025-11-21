@@ -5,31 +5,48 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TicketMessage extends BaseModel
+class TicketMessage extends Model
 {
     use HasFactory;
 
-    protected $keyType = 'string';
-    public $incrementing = false;
-    protected $primaryKey = 'id';
-
     protected $fillable = [
-        'ticket_id', 'sender_id', 'message', 'attachment'
+        'ticket_id',
+        'sender_id',
+        'message',
+        'attachment'
     ];
 
-    public $timestamps = false;
     protected $casts = [
         'created_at' => 'datetime',
     ];
 
-    // Relationships
+    // Relationship with the ticket
     public function ticket()
     {
-        return $this->belongsTo(Ticket::class);
+        return $this->belongsTo(Ticket::class, 'ticket_id');
     }
 
+    // Relationship with the user who sent the message
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    // Accessor for attachment URL
+    public function getAttachmentUrlAttribute()
+    {
+        if ($this->attachment) {
+            return asset('storage/' . $this->attachment);
+        }
+        return null;
+    }
+
+    // Accessor for attachment name
+    public function getAttachmentNameAttribute()
+    {
+        if ($this->attachment) {
+            return basename($this->attachment);
+        }
+        return null;
     }
 }

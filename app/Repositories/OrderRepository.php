@@ -60,7 +60,6 @@ class OrderRepository implements OrderRepositoryInterface
                     'status' => $status,
                     'changed_by' => $changedBy,
                     'note' => $note,
-                    'created_at' => now(),
                 ]);
 
                 return true;

@@ -16,8 +16,7 @@ class OrderStatusLog extends BaseModel
     protected $fillable = [
         'order_id', 'status', 'changed_by', 'note'
     ];
-
-    public $timestamps = false;
+    
     protected $casts = [
         'created_at' => 'datetime',
     ];
