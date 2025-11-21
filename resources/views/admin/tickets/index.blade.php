@@ -162,7 +162,7 @@
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">All Tickets</h6>
                 <div class="bulk-actions" style="display: none;">
-                    <select class="form-control form-control-sm d-inline-block w-auto" id="bulkAction">
+                    <select class="form-control form-control-sm d-inline-block w-auto me-2" id="bulkAction">
                         <option value="">Bulk Actions</option>
                         <option value="status">Change Status</option>
                         <option value="priority">Change Priority</option>
@@ -234,37 +234,34 @@
                                     <td>{{ $ticket->updated_at->format('M d, Y H:i') }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('admin.tickets.show', $ticket->id) }}" class="btn btn-sm btn-outline-info"
-                                                title="View Ticket">
+                                            <a href="{{ route('admin.tickets.show', $ticket->id) }}"
+                                                class="btn btn-sm btn-outline-info" title="View Ticket">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <div class="dropdown">
-                                                <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle"
-                                                    title="Quick Actions" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                    <i class="fas fa-cog"></i>
+
+                                            @if ($ticket->status !== 'closed')
+                                                <form action="{{ route('admin.tickets.change-status', $ticket->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="status" value="resolved">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success"
+                                                        title="Mark Resolved"
+                                                        onclick="return confirm('Mark this ticket as resolved?')">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            <form action="{{ route('admin.tickets.destroy', $ticket->id) }}"
+                                                method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    title="Delete Ticket"
+                                                    onclick="return confirm('Are you sure you want to delete this ticket?')">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                    @if ($ticket->status !== 'closed')
-                                                        <li>
-                                                            <a class="dropdown-item" href="#"
-                                                                onclick="quickAction('status', 'resolved', {{ $ticket->id }})">
-                                                                <i class="fas fa-check text-success me-2"></i> Mark
-                                                                Resolved
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <hr class="dropdown-divider">
-                                                        </li>
-                                                    @endif
-                                                    <li>
-                                                        <a class="dropdown-item text-danger" href="#"
-                                                            onclick="confirmDelete({{ $ticket->id }}, '{{ $ticket->subject }}')">
-                                                            <i class="fas fa-trash me-2"></i> Delete Ticket
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -282,14 +279,13 @@
     </div>
 
     <!-- Bulk Action Modal -->
-    <div class="modal fade" id="bulkActionModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="bulkActionModal" tabindex="-1" aria-labelledby="bulkActionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Bulk Action</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="bulkActionModalLabel">Bulk Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div id="bulkActionContent">
@@ -297,44 +293,51 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" onclick="applyBulkAction()">Apply Action</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Delete Form -->
-    <form id="deleteForm" method="POST" style="display: none;">
-        @csrf
-        @method('DELETE')
-    </form>
 @endsection
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        console.log('Admin Tickets Page');
+        console.log('Admin Tickets Page Loaded');
+
         // Bulk selection functionality
-        document.getElementById('selectAll').addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.ticket-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-            toggleBulkActions();
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeBulkActions();
         });
 
-        document.querySelectorAll('.ticket-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', toggleBulkActions);
-        });
+        function initializeBulkActions() {
+            const selectAll = document.getElementById('selectAll');
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.ticket-checkbox');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    toggleBulkActions();
+                });
+            }
+
+            document.querySelectorAll('.ticket-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', toggleBulkActions);
+            });
+        }
 
         function toggleBulkActions() {
             const checkedCount = document.querySelectorAll('.ticket-checkbox:checked').length;
             const bulkActions = document.querySelector('.bulk-actions');
-            if (checkedCount > 0) {
-                bulkActions.style.display = 'block';
-            } else {
-                bulkActions.style.display = 'none';
+            if (bulkActions) {
+                if (checkedCount > 0) {
+                    bulkActions.style.display = 'block';
+                } else {
+                    bulkActions.style.display = 'none';
+                }
             }
         }
 
@@ -345,6 +348,11 @@
 
             if (!action) {
                 alert('Please select an action');
+                return;
+            }
+
+            if (checkedTickets.length === 0) {
+                alert('Please select at least one ticket');
                 return;
             }
 
@@ -387,7 +395,10 @@
             }
 
             document.getElementById('bulkActionContent').innerHTML = content;
-            $('#bulkActionModal').modal('show');
+
+            // Use Bootstrap 5 modal
+            const modal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
+            modal.show();
         }
 
         function applyBulkAction() {
@@ -395,75 +406,115 @@
             const checkedTickets = Array.from(document.querySelectorAll('.ticket-checkbox:checked'))
                 .map(checkbox => checkbox.value);
 
+            if (checkedTickets.length === 0) {
+                alert('No tickets selected');
+                return;
+            }
+
             let formData = {
                 ticket_ids: checkedTickets,
                 action: action
             };
 
+            // Get additional data based on action
             switch (action) {
                 case 'status':
-                    formData.status = document.getElementById('bulkStatus').value;
+                    const statusSelect = document.getElementById('bulkStatus');
+                    if (statusSelect) {
+                        formData.status = statusSelect.value;
+                    }
                     break;
                 case 'priority':
-                    formData.priority = document.getElementById('bulkPriority').value;
+                    const prioritySelect = document.getElementById('bulkPriority');
+                    if (prioritySelect) {
+                        formData.priority = prioritySelect.value;
+                    }
+                    break;
+                case 'delete':
+                    // No additional data needed for delete
                     break;
             }
+
+            console.log('Sending bulk action:', formData);
+
+            // Show loading state
+            const submitBtn = document.querySelector('#bulkActionModal .btn-primary');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
 
             fetch('{{ route('admin.tickets.bulk-update') }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(formData)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
+                .then(response => {
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
                     } else {
-                        alert('Error: ' + data.message);
+                        return response.text().then(text => {
+                            throw new Error('Server returned HTML. Possible server error.');
+                        });
+                    }
+                })
+                .then(data => {
+                    console.log('Bulk action response:', data);
+
+                    // Hide modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('bulkActionModal'));
+                    modal.hide();
+
+                    if (data.success) {
+                        // Show success message
+                        showAlert('success', data.message || 'Action completed successfully');
+                        // Reload after a short delay
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showAlert('error', data.message || 'Action failed');
                     }
                 })
                 .catch(error => {
-                    alert('Error: ' + error);
-                });
-        }
-
-        function quickAction(type, value, ticketId) {
-            let formData = {
-                ticket_ids: [ticketId],
-                action: type
-            };
-
-            if (type === 'status') {
-                formData.status = value;
-            }
-
-            fetch('{{ route('admin.tickets.bulk-update') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify(formData)
+                    console.error('Bulk action error:', error);
+                    showAlert('error', 'Error: ' + error.message);
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
+                .finally(() => {
+                    // Reset button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
                 });
         }
 
-        function confirmDelete(ticketId, subject) {
-            if (confirm(`Are you sure you want to delete ticket: "${subject}"?`)) {
-                const form = document.getElementById('deleteForm');
-                form.action = `{{ url('admin/tickets') }}/${ticketId}`;
-                form.submit();
-            }
+        function showAlert(type, message) {
+            // Remove existing alerts
+            const existingAlerts = document.querySelectorAll('.custom-alert');
+            existingAlerts.forEach(alert => alert.remove());
+
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const alertHtml = `
+            <div class="alert ${alertClass} custom-alert alert-dismissible fade show" role="alert" 
+                 style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.custom-alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
         }
     </script>
 @endpush

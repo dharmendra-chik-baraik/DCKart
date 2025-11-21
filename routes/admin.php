@@ -1,23 +1,19 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\VendorController;
-use App\Http\Controllers\Admin\OrderManagementController;
-use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\ReviewController;
-use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\OrderManagementController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PayoutController;
-use App\Http\Controllers\Admin\TicketController;    
-
-
-
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\TicketController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VendorController;
 use Illuminate\Support\Facades\Route;
-
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -73,7 +69,6 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::post('/{id}/update-stock', [ProductController::class, 'updateStock'])->name('update-stock');
 });
 
-
 // Orders Management
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderManagementController::class, 'index'])->name('orders.index');
@@ -94,7 +89,6 @@ Route::prefix('inventory')->group(function () {
     Route::post('/bulk-update', [InventoryController::class, 'bulkUpdate'])->name('inventory.bulk-update');
     Route::post('/update-stock-status', [InventoryController::class, 'updateStockStatus'])->name('inventory.update-stock-status');
 });
-
 
 // Coupon Management Routes
 Route::prefix('coupons')->group(function () {

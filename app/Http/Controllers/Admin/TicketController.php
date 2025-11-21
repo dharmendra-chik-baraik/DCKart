@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TicketMessageRequest;
 use App\Http\Requests\Admin\TicketStoreRequest;
 use App\Http\Requests\Admin\TicketUpdateRequest;
-use App\Http\Requests\Admin\TicketMessageRequest;
-use App\Services\TicketService;
 use App\Models\User;
 use App\Models\VendorProfile;
+use App\Services\TicketService;
 use Illuminate\Http\Request;
 
 class TicketController extends Controller
@@ -50,14 +50,14 @@ class TicketController extends Controller
     {
         try {
             $ticketData = $request->validated();
-            
+
             // Remove assigned_to from data if present
             if (isset($ticketData['assigned_to'])) {
                 unset($ticketData['assigned_to']);
             }
-            
+
             $ticket = $this->ticketService->createTicket($ticketData);
-            
+
             // Add the initial message
             $this->ticketService->addMessage($ticket->id, [
                 'sender_id' => auth()->id(),
@@ -66,10 +66,10 @@ class TicketController extends Controller
 
             return redirect()->route('admin.tickets.show', $ticket->id)
                 ->with('success', 'Ticket created successfully.');
-                
+
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to create ticket: ' . $e->getMessage())
+                ->with('error', 'Failed to create ticket: '.$e->getMessage())
                 ->withInput();
         }
     }
@@ -90,15 +90,15 @@ class TicketController extends Controller
             if (isset($data['assigned_to'])) {
                 unset($data['assigned_to']);
             }
-            
+
             $ticket = $this->ticketService->updateTicket($id, $data);
 
             return redirect()->route('admin.tickets.show', $id)
                 ->with('success', 'Ticket updated successfully.');
-                
+
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to update ticket: ' . $e->getMessage());
+                ->with('error', 'Failed to update ticket: '.$e->getMessage());
         }
     }
 
@@ -106,7 +106,7 @@ class TicketController extends Controller
     {
         try {
             $message = $this->ticketService->addMessage(
-                $id, 
+                $id,
                 [
                     'sender_id' => auth()->id(),
                     'message' => $request->message,
@@ -116,10 +116,10 @@ class TicketController extends Controller
 
             return redirect()->route('admin.tickets.show', $id)
                 ->with('success', 'Message added successfully.');
-                
+
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to add message: ' . $e->getMessage());
+                ->with('error', 'Failed to add message: '.$e->getMessage());
         }
     }
 
@@ -134,10 +134,10 @@ class TicketController extends Controller
 
             return redirect()->route('admin.tickets.show', $id)
                 ->with('success', 'Ticket status updated successfully.');
-                
+
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to update ticket status: ' . $e->getMessage());
+                ->with('error', 'Failed to update ticket status: '.$e->getMessage());
         }
     }
 
@@ -150,61 +150,101 @@ class TicketController extends Controller
 
             return redirect()->route('admin.tickets.index')
                 ->with('success', 'Ticket deleted successfully.');
-                
+
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to delete ticket: ' . $e->getMessage());
+                ->with('error', 'Failed to delete ticket: '.$e->getMessage());
         }
     }
 
     public function bulkUpdate(Request $request)
     {
-        $request->validate([
-            'ticket_ids' => 'required|array',
-            'ticket_ids.*' => 'exists:tickets,id',
-            'action' => 'required|in:status,priority,delete',
-            // REMOVED: assign from actions
-        ]);
+        // Check if it's an AJAX/JSON request
+        if ($request->expectsJson() || $request->isJson()) {
+            try {
+                \Log::info('Bulk update JSON request received', $request->all());
 
-        try {
-            $results = [];
+                $validated = $request->validate([
+                    'ticket_ids' => 'required|array',
+                    'ticket_ids.*' => 'exists:tickets,id',
+                    'action' => 'required|in:status,priority,delete',
+                ]);
 
-            switch ($request->action) {
-                case 'status':
-                    $request->validate(['status' => 'required|in:open,in_progress,resolved,closed']);
-                    $results = $this->ticketService->bulkUpdate($request->ticket_ids, ['status' => $request->status]);
-                    break;
+                $successCount = 0;
+                $results = [];
 
-                case 'priority':
-                    $request->validate(['priority' => 'required|in:low,medium,high,urgent']);
-                    $results = $this->ticketService->bulkUpdate($request->ticket_ids, ['priority' => $request->priority]);
-                    break;
+                switch ($request->action) {
+                    case 'status':
+                        $statusValidated = $request->validate([
+                            'status' => 'required|in:open,in_progress,resolved,closed',
+                        ]);
 
-                case 'delete':
-                    foreach ($request->ticket_ids as $ticketId) {
-                        $this->ticketService->deleteTicket($ticketId);
-                    }
-                    $results = ['success' => true];
-                    break;
+                        foreach ($request->ticket_ids as $ticketId) {
+                            try {
+                                $this->ticketService->changeStatus($ticketId, $request->status);
+                                $successCount++;
+                            } catch (\Exception $e) {
+                                \Log::error("Failed to update ticket {$ticketId}: ".$e->getMessage());
+                            }
+                        }
+                        break;
+
+                    case 'priority':
+                        $priorityValidated = $request->validate([
+                            'priority' => 'required|in:low,medium,high,urgent',
+                        ]);
+
+                        foreach ($request->ticket_ids as $ticketId) {
+                            try {
+                                $this->ticketService->updateTicket($ticketId, ['priority' => $request->priority]);
+                                $successCount++;
+                            } catch (\Exception $e) {
+                                \Log::error("Failed to update ticket {$ticketId}: ".$e->getMessage());
+                            }
+                        }
+                        break;
+
+                    case 'delete':
+                        foreach ($request->ticket_ids as $ticketId) {
+                            try {
+                                $this->ticketService->deleteTicket($ticketId);
+                                $successCount++;
+                            } catch (\Exception $e) {
+                                \Log::error("Failed to delete ticket {$ticketId}: ".$e->getMessage());
+                            }
+                        }
+                        break;
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Successfully processed {$successCount} tickets",
+                    'processed_count' => $successCount,
+                ]);
+
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Server error: '.$e->getMessage(),
+                ], 500);
             }
-
-            $successCount = count(array_filter($results, function($result) {
-                return isset($result['status']) && $result['status'] === 'success';
-            }));
-
-            return redirect()->route('admin.tickets.index')
-                ->with('success', "Successfully processed {$successCount} tickets.");
-                
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Failed to process bulk action: ' . $e->getMessage());
         }
+
+        return redirect()->back()->with('error', 'Invalid request format');
     }
 
     public function downloadAttachment($filename)
     {
         try {
             $path = Storage::disk('public')->path($filename);
+
             return response()->download($path);
         } catch (\Exception $e) {
             return redirect()->back()
