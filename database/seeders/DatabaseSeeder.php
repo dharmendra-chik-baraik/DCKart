@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             CouponUserSeeder::class,
             ActivityLogSeeder::class,
             NotificationSeeder::class,
+            SettingsTableSeeder::class,
         ]);
 
         echo "All seeders completed successfully!\n";

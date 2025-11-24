@@ -143,7 +143,7 @@
 
             <!-- Pages -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/pages*') ? 'active' : '' }}" href="#admin.pages.index') }}">
+                <a class="nav-link {{ request()->is('admin/pages*') ? 'active' : '' }}" href="{{ route('admin.pages.index') }}">
                     <i class="fas fa-file"></i> Pages
                     <span class="badge bg-secondary ms-1">{{ $totalPages }}</span>
                 </a>
@@ -151,14 +151,14 @@
 
             <!-- Activity Logs -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/activity-logs*') ? 'active' : '' }}" href="#admin.activity-logs.index') }}">
+                <a class="nav-link {{ request()->is('admin/activity-logs*') ? 'active' : '' }}" href="{{ route('admin.activity-logs.index') }}">
                     <i class="fas fa-history"></i> Activity Logs
                 </a>
             </li>
 
             <!-- System Settings -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('admin/settings*') ? 'active' : '' }}" href="#admin.settings.general') }}">
+                <a class="nav-link {{ request()->is('admin/settings*') ? 'active' : '' }}" href="{{ route('admin.settings.index') }}">
                     <i class="fas fa-cog"></i> System Settings
                 </a>
             </li>

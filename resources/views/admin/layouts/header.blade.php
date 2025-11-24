@@ -1,5 +1,5 @@
 <header class="admin-header">
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="#">
                 <i class="fas fa-crown me-2"></i>{{ config('app.name', 'MultiVendor') }} - Admin

@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
-@section('title', 'Home - ' . config('app.name', 'MultiVendor'))
+@section('title', 'Home - ' . config('app.name', 'DCKart'))
 
 @section('content')
 <!-- Hero Section -->
-<section class="hero-section bg-gradient-primary text-white py-5">
+<section class="hero-section text-white py-5">
     <div class="container">
         <div class="row align-items-center min-vh-75">
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold mb-4">Discover Amazing Products from Local Vendors</h1>
                 <p class="lead mb-4">Shop from thousands of unique products crafted by independent sellers. Find everything you need in one marketplace.</p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="#products" class="btn btn-light btn-lg px-4 py-2 fw-semibold">
+                    <a href="{{ route('products.index') }}" class="btn btn-light btn-lg px-4 py-2 fw-semibold">
                         <i class="fas fa-shopping-bag me-2"></i>Shop Now
                     </a>
                     <a href="#vendors" class="btn btn-outline-light btn-lg px-4 py-2">
@@ -46,15 +46,15 @@
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col-12">
-                <h2 class="fw-bold text-dark mb-3">Why Choose Our Platform?</h2>
+                <h2 class="fw-bold text-dark mb-3">Why Choose DCKart?</h2>
                 <p class="text-muted lead">We provide the best shopping experience for both buyers and sellers</p>
             </div>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                <div class="card feature-card border-0 shadow-sm h-100 text-center p-4">
                     <div class="card-body">
-                        <div class="feature-icon bg-primary rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <div class="feature-icon bg-primary rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
                             <i class="fas fa-shield-alt fa-2x text-white"></i>
                         </div>
                         <h5 class="fw-bold mb-3">Secure Shopping</h5>
@@ -63,9 +63,9 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                <div class="card feature-card border-0 shadow-sm h-100 text-center p-4">
                     <div class="card-body">
-                        <div class="feature-icon bg-success rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <div class="feature-icon bg-success rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
                             <i class="fas fa-rocket fa-2x text-white"></i>
                         </div>
                         <h5 class="fw-bold mb-3">Fast Delivery</h5>
@@ -74,9 +74,9 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                <div class="card feature-card border-0 shadow-sm h-100 text-center p-4">
                     <div class="card-body">
-                        <div class="feature-icon bg-warning rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <div class="feature-icon bg-warning rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
                             <i class="fas fa-handshake fa-2x text-white"></i>
                         </div>
                         <h5 class="fw-bold mb-3">Trusted Vendors</h5>
@@ -98,49 +98,31 @@
             </div>
         </div>
         <div class="row g-4">
+            @forelse($categories as $category)
             <div class="col-md-3 col-6">
-                <a href="#" class="card category-card text-decoration-none text-dark border-0 shadow-sm h-100">
+                <a href="{{ route('categories.show', $category->slug) }}" class="card category-card text-decoration-none text-dark border-0 shadow-sm h-100">
                     <div class="card-body text-center p-4">
                         <div class="category-icon mb-3">
-                            <i class="fas fa-tshirt fa-2x text-primary"></i>
+                            @if($category->icon)
+                                <i class="{{ $category->icon }} fa-2x text-primary"></i>
+                            @else
+                                <i class="fas fa-tag fa-2x text-primary"></i>
+                            @endif
                         </div>
-                        <h6 class="fw-bold mb-2">Fashion</h6>
-                        <p class="text-muted small mb-0">Clothing & Accessories</p>
+                        <h6 class="fw-bold mb-2">{{ $category->name }}</h6>
+                        <p class="text-muted small mb-0">{{ $category->products_count }} products</p>
                     </div>
                 </a>
             </div>
-            <div class="col-md-3 col-6">
-                <a href="#" class="card category-card text-decoration-none text-dark border-0 shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon mb-3">
-                            <i class="fas fa-laptop fa-2x text-info"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">Electronics</h6>
-                        <p class="text-muted small mb-0">Gadgets & Devices</p>
-                    </div>
-                </a>
+            @empty
+            <div class="col-12 text-center">
+                <p class="text-muted">No categories available at the moment.</p>
             </div>
-            <div class="col-md-3 col-6">
-                <a href="#" class="card category-card text-decoration-none text-dark border-0 shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon mb-3">
-                            <i class="fas fa-home fa-2x text-success"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">Home & Garden</h6>
-                        <p class="text-muted small mb-0">Furniture & Decor</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3 col-6">
-                <a href="#" class="card category-card text-decoration-none text-dark border-0 shadow-sm h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="category-icon mb-3">
-                            <i class="fas fa-heartbeat fa-2x text-danger"></i>
-                        </div>
-                        <h6 class="fw-bold mb-2">Health & Beauty</h6>
-                        <p class="text-muted small mb-0">Cosmetics & Wellness</p>
-                    </div>
-                </a>
+            @endforelse
+        </div>
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{{ route('categories.index') }}" class="btn btn-outline-primary">View All Categories</a>
             </div>
         </div>
     </div>
@@ -156,23 +138,25 @@
             </div>
         </div>
         <div class="row g-4">
-            @for($i = 1; $i <= 8; $i++)
+            @forelse($featuredProducts as $product)
             <div class="col-lg-3 col-md-6">
                 <div class="card product-card border-0 shadow-sm h-100">
                     <div class="position-relative">
-                        <img src="https://cdn.pixabay.com/photo/2016/11/29/08/41/apple-1868496_1280.jpg" 
-                             class="card-img-top" alt="Product {{ $i }}" style="height: 200px; object-fit: cover;">
+                        <img src="{{ $product->images->first()->image_path ?? 'https://cdn.pixabay.com/photo/2016/11/29/08/41/apple-1868496_1280.jpg' }}" 
+                             class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
                         <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-danger">Hot</span>
+                            <span class="badge bg-danger">Featured</span>
                         </div>
                     </div>
                     <div class="card-body">
-                        <h6 class="card-title fw-bold">Premium Product {{ $i }}</h6>
-                        <p class="card-text text-muted small">High-quality product with excellent features</p>
+                        <h6 class="card-title fw-bold">{{ Str::limit($product->name, 50) }}</h6>
+                        <p class="card-text text-muted small">{{ Str::limit($product->short_description, 80) }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="h5 text-primary fw-bold">${{ rand(20, 200) }}</span>
-                                <span class="text-muted text-decoration-line-through small ms-2">${{ rand(250, 400) }}</span>
+                                <span class="h5 text-primary fw-bold">₹{{ number_format($product->price, 2) }}</span>
+                                @if($product->sale_price)
+                                <span class="text-muted text-decoration-line-through small ms-2">₹{{ number_format($product->sale_price, 2) }}</span>
+                                @endif
                             </div>
                             <span class="text-warning small">
                                 <i class="fas fa-star"></i>
@@ -182,19 +166,44 @@
                                 <i class="fas fa-star-half-alt"></i>
                             </span>
                         </div>
+                        <small class="text-muted">Sold by: {{ $product->vendor->shop_name }}</small>
                     </div>
                     <div class="card-footer bg-transparent border-0">
-                        <button class="btn btn-primary w-100">
-                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                        </button>
+                        <div class="d-grid gap-2">
+                            <a href="{{ route('products.show', $product->slug) }}" class="btn btn-outline-primary btn-sm">
+                                View Details
+                            </a>
+                            @if($product->stock_status === 'in_stock')
+                            <form action="{{ route('cart.add') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+                                </button>
+                            </form>
+                            @else
+                            <button class="btn btn-secondary btn-sm w-100" disabled>
+                                Out of Stock
+                            </button>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
-            @endfor
+            @empty
+            <div class="col-12 text-center">
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No featured products available</h4>
+                    <p class="text-muted">Check back later for new arrivals</p>
+                </div>
+            </div>
+            @endforelse
         </div>
         <div class="row mt-5">
             <div class="col-12 text-center">
-                <a href="#" class="btn btn-outline-primary btn-lg px-5">View All Products</a>
+                <a href="{{ route('products.index') }}" class="btn btn-outline-primary btn-lg px-5">View All Products</a>
             </div>
         </div>
     </div>
@@ -243,7 +252,7 @@
 </section>
 
 <!-- Stats Section -->
-<section class="py-5 bg-dark text-white">
+<section class="stats-section text-white">
     <div class="container">
         <div class="row text-center g-4">
             <div class="col-md-3 col-6">
@@ -275,7 +284,7 @@
 </section>
 
 <!-- Newsletter Section -->
-<section class="py-5 bg-primary text-white">
+<section class="newsletter-section text-white">
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-lg-6">
@@ -291,51 +300,4 @@
         </div>
     </div>
 </section>
-
-<style>
-.hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.min-vh-75 {
-    min-height: 75vh;
-}
-
-.feature-icon {
-    transition: transform 0.3s ease;
-}
-
-.card:hover .feature-icon {
-    transform: scale(1.1);
-}
-
-.category-card, .product-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.category-card:hover, .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-}
-
-.stat-item {
-    padding: 20px 0;
-}
-
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-@media (max-width: 768px) {
-    .display-4 {
-        font-size: 2rem;
-    }
-    
-    .hero-section {
-        text-align: center;
-        padding: 3rem 0;
-    }
-}
-</style>
-
 @endsection

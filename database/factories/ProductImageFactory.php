@@ -12,7 +12,7 @@ class ProductImageFactory extends Factory
         return [
             'id' => Str::uuid(),
             'product_id' => \App\Models\Product::factory(),
-            'image_path' => $this->faker->imageUrl(600, 600, 'products', true, 'product'),
+            'image_path' => $this->faker->passthrough('https://placehold.co/600x600/6f42c1/ffffff?text=Product+Image'),
             'position' => $this->faker->numberBetween(0, 5),
         ];
     }

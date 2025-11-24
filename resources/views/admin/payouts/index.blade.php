@@ -299,11 +299,8 @@
             </div>
             
             <!-- Pagination -->
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="text-muted">
-                    Showing {{ $payouts->firstItem() }} to {{ $payouts->lastItem() }} of {{ $payouts->total() }} entries
-                </div>
-                {{ $payouts->links() }}
+            <div class="mt-3">
+                {{ $payouts->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>

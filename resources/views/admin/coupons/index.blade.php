@@ -217,7 +217,7 @@
 
                     <!-- Pagination -->
                     <div class="mt-3">
-                        {{ $coupons->links() }}
+                        {{ $coupons->links('pagination::bootstrap-5') }}
                     </div>
                     @else
                     <div class="text-center py-5">

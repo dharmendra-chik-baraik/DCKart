@@ -28,6 +28,7 @@ class TicketMessageSeeder extends Seeder
                     'ticket_id' => $ticket->id,
                     'sender_id' => $sender,
                     'created_at' => now()->subHours($messageCount - $i),
+                    'updated_at' => now()->subHours($messageCount - $i),
                 ]);
             }
         }

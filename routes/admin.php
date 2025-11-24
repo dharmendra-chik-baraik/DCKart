@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -157,4 +160,47 @@ Route::prefix('tickets')->group(function () {
     Route::post('/{id}/assign', [TicketController::class, 'assign'])->name('tickets.assign');
     Route::post('/bulk-update', [TicketController::class, 'bulkUpdate'])->name('tickets.bulk-update');
     Route::get('/attachment/{filename}', [TicketController::class, 'downloadAttachment'])->name('tickets.download-attachment');
+});
+
+// Pages Management Routes
+Route::prefix('pages')->group(function () {
+    Route::get('/', [PageController::class, 'index'])->name('pages.index');
+    Route::get('/create', [PageController::class, 'create'])->name('pages.create');
+    Route::post('/', [PageController::class, 'store'])->name('pages.store');
+    Route::get('/{page}/edit', [PageController::class, 'edit'])->name('pages.edit');
+    Route::put('/{page}', [PageController::class, 'update'])->name('pages.update');
+    Route::delete('/{page}', [PageController::class, 'destroy'])->name('pages.destroy');
+    Route::post('/{page}/toggle-status', [PageController::class, 'toggleStatus'])->name('pages.toggle-status');
+});
+
+// Activity Logs Routes
+Route::prefix('activity-logs')->group(function () {
+    Route::get('/', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('/{activityLog}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
+    Route::delete('/{activityLog}', [ActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
+    Route::post('/clear-old', [ActivityLogController::class, 'clearOldLogs'])->name('activity-logs.clear-old');
+    Route::post('/export', [ActivityLogController::class, 'export'])->name('activity-logs.export');
+});
+
+// System Settings Routes
+Route::prefix('settings')->group(function () {
+    // Main settings dashboard
+    Route::get('/', [SettingController::class, 'index'])->name('settings.index');
+    
+    // Individual settings pages
+    Route::get('/general', [SettingController::class, 'general'])->name('settings.general');
+    Route::post('/general', [SettingController::class, 'updateGeneral'])->name('settings.update-general');
+    Route::get('/email', [SettingController::class, 'email'])->name('settings.email');
+    Route::post('/email', [SettingController::class, 'updateEmail'])->name('settings.update-email');
+    Route::get('/payment', [SettingController::class, 'payment'])->name('settings.payment');
+    Route::post('/payment', [SettingController::class, 'updatePayment'])->name('settings.update-payment');
+    Route::get('/maintenance', [SettingController::class, 'maintenance'])->name('settings.maintenance');
+    Route::post('/maintenance/toggle', [SettingController::class, 'toggleMaintenance'])->name('settings.toggle-maintenance');
+    Route::post('/clear-cache', [SettingController::class, 'clearCache'])->name('settings.clear-cache');
+    
+    // Add routes for other setting groups
+    Route::get('/ecommerce', [SettingController::class, 'general'])->name('settings.ecommerce');
+    Route::get('/vendor', [SettingController::class, 'general'])->name('settings.vendor');
+    Route::get('/order', [SettingController::class, 'general'])->name('settings.order');
+    Route::get('/tax', [SettingController::class, 'general'])->name('settings.tax');
 });

@@ -16,6 +16,7 @@ class TicketMessageFactory extends Factory
             'message' => $this->faker->paragraph(),
             'attachment' => $this->faker->optional()->filePath(),
             'created_at' => $this->faker->dateTimeThisMonth(),
+            'updated_at' => $this->faker->dateTimeThisMonth(),
         ];
     }
 

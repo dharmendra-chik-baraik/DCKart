@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('message');
             $table->string('attachment')->nullable();
             $table->timestamp('created_at');
+            $table->timestamp('updated_at');
             
             $table->index('ticket_id');
             $table->index('sender_id');

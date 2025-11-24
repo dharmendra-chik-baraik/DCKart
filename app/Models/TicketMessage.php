@@ -18,6 +18,7 @@ class TicketMessage extends Model
 
     protected $casts = [
         'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Relationship with the ticket

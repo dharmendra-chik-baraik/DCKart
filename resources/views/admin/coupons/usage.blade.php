@@ -121,7 +121,7 @@
 
                             <!-- Pagination -->
                             <div class="mt-3">
-                                {{ $usage->links() }}
+                                {{ $usage->links('pagination::bootstrap-5') }}
                             </div>
                         @else
                             <div class="text-center py-5">

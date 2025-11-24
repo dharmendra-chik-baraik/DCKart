@@ -20,6 +20,7 @@ class ActivityLogFactory extends Factory
             'description' => $this->faker->sentence(),
             'ip_address' => $this->faker->ipv4(),
             'created_at' => $this->faker->dateTimeThisYear(),
+            'updated_at' => $this->faker->dateTimeThisYear(),
         ];
     }
 

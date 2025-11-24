@@ -246,7 +246,7 @@
 
                             <!-- Pagination -->
                             <div class="mt-3">
-                                {{ $reviews->links() }}
+                                {{ $reviews->links('pagination::bootstrap-5') }}
                             </div>
                         @else
                             <div class="text-center py-5">

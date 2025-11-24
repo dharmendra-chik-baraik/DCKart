@@ -14,22 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')
                 ->group(base_path('routes/auth.php'));
 
-            // Default home route
-            Route::middleware('web')
-                ->get('/', function () {
-                    if (auth()->check()) {
-                        $user = auth()->user();
-                        return match($user->role) {
-                            'admin' => redirect()->route('admin.dashboard'),
-                            'vendor' => redirect()->route('vendor.dashboard'),
-                            'customer' => redirect()->route('customer.dashboard'),
-                            default => view('home'),
-                        };
-                    }
-                    return view('home');
-                })->name('home');
-
-            // Protected role-based routes
             Route::middleware(['web', 'auth', 'admin'])
                 ->prefix('admin')
                 ->name('admin.')
