@@ -195,3 +195,48 @@ if (!function_exists('getPriorityIcon')) {
         };
     }
 }
+
+// Order Status Colors
+
+if (!function_exists('getOrderStatusColor')) {
+    function getOrderStatusColor($status) {
+        $colors = [
+            'pending' => 'warning',
+            'confirmed' => 'info',
+            'processing' => 'primary',
+            'shipped' => 'info',
+            'delivered' => 'success',
+            'cancelled' => 'danger'
+        ];
+        
+        return $colors[$status] ?? 'secondary';
+    }
+}
+if (!function_exists('getStatusBadgeColor')) {
+    function getStatusBadgeColor($status) {
+        return match($status) {
+            'pending' => 'warning',
+            'processing' => 'info',
+            'completed' => 'success',
+            'shipped' => 'primary',
+            'cancelled' => 'danger',
+            'refunded' => 'secondary',
+            default => 'secondary'
+        };
+    }
+}
+if (!function_exists('getOrderStatusColor')) {
+    function getOrderStatusColor(string $status): string
+    {
+        $colors = [
+            'pending' => 'warning',
+            'confirmed' => 'info',
+            'processing' => 'primary',
+            'shipped' => 'info',
+            'delivered' => 'success',
+            'cancelled' => 'danger'
+        ];
+        
+        return $colors[$status] ?? 'secondary';
+    }
+}

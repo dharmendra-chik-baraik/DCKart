@@ -45,8 +45,7 @@
                                 </a>
                             </li>
                         @empty
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-tags me-2"></i>All
-                                    Categories</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-tags me-2"></i>All Categories</a></li>
                         @endforelse
 
                         <li>
@@ -149,17 +148,22 @@
                                 </li>
                             @else
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('customer.profile') }}">
+                                    <a class="dropdown-item" href="{{ route('customer.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('customer.profile.edit') }}">
                                         <i class="fas fa-user me-2"></i>My Profile
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('customer.orders') }}">
+                                    <a class="dropdown-item" href="{{ route('customer.orders.index') }}">
                                         <i class="fas fa-shopping-bag me-2"></i>My Orders
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('customer.wishlist') }}">
+                                    <a class="dropdown-item" href="{{ route('customer.wishlist.index') }}">
                                         <i class="fas fa-heart me-2"></i>Wishlist
                                     </a>
                                 </li>
@@ -199,9 +203,8 @@
                         <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-bell"></i>
                             @php
-                                $notificationCount = App\Models\Notification::where('notifiable_id', Auth::id())
-                                    ->whereNull('read_at')
-                                    ->count();
+                                // Use Laravel's built-in notifications system
+                                $notificationCount = auth()->user()->unreadNotifications()->count();
                             @endphp
                             @if ($notificationCount > 0)
                                 <span
@@ -212,23 +215,55 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end p-2" style="width: 300px;">
                             <li class="dropdown-header">Notifications</li>
-                            <!-- Dynamic notifications would go here -->
-                            <li><a class="dropdown-item" href="#">New order received</a></li>
-                            <li><a class="dropdown-item" href="#">Product review added</a></li>
-                            <li><a class="dropdown-item" href="#">New message</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item text-center" href="#">View All</a></li>
+                            
+                            @php
+                                $notifications = auth()->user()->unreadNotifications()->take(5)->get();
+                            @endphp
+                            
+                            @forelse($notifications as $notification)
+                                <li>
+                                    <a class="dropdown-item small" href="#">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-bell text-primary me-2"></i>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold">{{ $notification->data['title'] ?? 'Notification' }}</div>
+                                                <div class="text-muted">{{ Str::limit($notification->data['message'] ?? '', 30) }}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            @empty
+                                <li><a class="dropdown-item text-muted text-center" href="#">No new notifications</a></li>
+                            @endforelse
+
+                            @if($notifications->count() > 0)
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-center small" href="{{ route('customer.notifications.index') }}">
+                                        View All Notifications
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-center small text-primary" href="#" 
+                                       onclick="event.preventDefault(); document.getElementById('mark-all-read').submit();">
+                                        Mark All as Read
+                                    </a>
+                                    <form id="mark-all-read" action="{{ route('customer.notifications.markAllAsRead') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </li>
+                            @endif
                         </ul>
                     </li>
                 @else
-                    <!-- Cart Icon -->
+                    <!-- Guest User -->
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{{ route('cart.index') }}" id="cartIcon">
                             <i class="fas fa-shopping-cart"></i>
                             @php
-                                $cartCount = app(App\Services\Frontend\CartService::class)->getCartCount();
+                                $cartCount = app(App\Services\Customer\CartService::class)->getCartCount();
                             @endphp
                             @if ($cartCount > 0)
                                 <span
@@ -240,7 +275,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('wishlist.index') }}">
+                        <a class="nav-link" href="{{ route('customer.wishlist.index') }}">
                             <i class="fas fa-heart"></i> Wishlist
                         </a>
                     </li>

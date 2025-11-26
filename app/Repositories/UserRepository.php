@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Interfaces\UserRepositoryInterface;
@@ -42,6 +43,7 @@ class UserRepository implements UserRepositoryInterface
             return User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'phone' => $data['phone'],
                 'password' => bcrypt($data['password']),
                 'role' => $data['role'] ?? 'customer',
                 'status' => $data['status'] ?? 'active',

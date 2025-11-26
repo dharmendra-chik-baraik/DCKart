@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories\Frontend;
+namespace App\Repositories\Customer;
 
-use App\Interfaces\Frontend\CartRepositoryInterface;
+use App\Interfaces\Customer\CartRepositoryInterface;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;

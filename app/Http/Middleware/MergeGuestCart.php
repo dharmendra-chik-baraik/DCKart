@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Services\Frontend\CartService;
+use App\Services\Customer\CartService;
 
 class MergeGuestCart
 {

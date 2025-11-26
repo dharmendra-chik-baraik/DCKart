@@ -4,9 +4,9 @@
 
 @section('content')
 <div class="container">
-    <div class="row dc-login d-flex justify-content-center">
+    <div class="row dc-login my-5 d-flex justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow">
+            <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white text-center py-4">
                     <h3 class="mb-0">Welcome Back</h3>
                     <p class="mb-0 opacity-75">Sign in to your account</p>
@@ -52,7 +52,10 @@
 
                         <div class="text-center">
                             <p class="mb-0">Don't have an account? 
-                                <a href="#" class="text-decoration-none">Register here</a>
+                                <a href="{{ route('register') }}" class="text-decoration-none">Register here</a>
+                            </p>
+                            <p class="mb-0">Are you a vendor? 
+                                <a href="{{ route('vendor.register') }}" class="text-decoration-none">Apply here</a>
                             </p>
                         </div>
                     </form>

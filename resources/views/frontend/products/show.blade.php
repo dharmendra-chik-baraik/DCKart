@@ -92,7 +92,7 @@
                                 <i class="fas fa-shopping-cart me-2"></i>
                                 Add to Cart
                             </button>
-                            <form action="{{ route('wishlist.add', $product) }}" method="POST" class="flex-fill">
+                            <form action="{{ route('customer.wishlist.add', $product) }}" method="POST" class="flex-fill">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-secondary btn-lg w-100">
                                     <i class="fas fa-heart me-2"></i>

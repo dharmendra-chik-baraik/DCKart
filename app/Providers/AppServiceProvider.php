@@ -9,6 +9,7 @@ use App\Interfaces\AuthServiceInterface;
 use App\Services\AuthService;
 use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\UserRepository;
+use App\Services\VendorAuthService;
 
 // Vendor
 use App\Interfaces\VendorRepositoryInterface;
@@ -56,34 +57,34 @@ use App\Repositories\SettingRepository;
 use App\Interfaces\ActivityLogRepositoryInterface;
 use App\Repositories\ActivityLogRepository;
 
+// =========================
+// CUSTOMER BINDINGS
+// =========================
+use App\Interfaces\Customer\OrderRepositoryInterface as CustomerOrderRepoInterface;
+use App\Repositories\Customer\OrderRepository as CustomerOrderRepository;
+use App\Services\Customer\OrderService as CustomerOrderService;
+use App\Interfaces\Customer\CartRepositoryInterface;
+use App\Repositories\Customer\CartRepository;
+use App\Interfaces\Customer\WishlistRepositoryInterface;
+use App\Repositories\Customer\WishlistRepository;
 
 // =========================
 // FRONTEND ALIASES
 // =========================
-
 use App\Interfaces\Frontend\HomeRepositoryInterface as FrontHomeRepoInterface;
 use App\Repositories\Frontend\HomeRepository as FrontHomeRepository;
-
 use App\Interfaces\Frontend\ProductRepositoryInterface as FrontProductRepoInterface;
 use App\Repositories\Frontend\ProductRepository as FrontProductRepository;
-
 use App\Interfaces\Frontend\CategoryRepositoryInterface as FrontCategoryRepoInterface;
 use App\Repositories\Frontend\CategoryRepository as FrontCategoryRepository;
-
 use App\Interfaces\Frontend\VendorRepositoryInterface as FrontVendorRepoInterface;
 use App\Repositories\Frontend\VendorRepository as FrontVendorRepository;
-
-use App\Interfaces\Frontend\CartRepositoryInterface;
-use App\Repositories\Frontend\CartRepository;
-use App\Interfaces\Frontend\WishlistRepositoryInterface;
-use App\Repositories\Frontend\WishlistRepository;
 use App\Interfaces\Frontend\PageRepositoryInterface as FrontPageRepoInterface;
 use App\Repositories\Frontend\PageRepository as FrontPageRepository;
 use App\Interfaces\Frontend\ContactRepositoryInterface;
 use App\Repositories\Frontend\ContactRepository;
 use App\Interfaces\Frontend\SearchRepositoryInterface;
 use App\Repositories\Frontend\SearchRepository;
-
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -92,6 +93,7 @@ class AppServiceProvider extends ServiceProvider
         // Auth & User
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(VendorAuthService::class, VendorAuthService::class);
 
         // Vendor
         $this->app->bind(VendorRepositoryInterface::class, VendorRepository::class);
@@ -100,9 +102,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
 
-        // Orders
+        // Orders (Admin/Vendor)
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         $this->app->bind(OrderServiceInterface::class, OrderService::class);
+
+        // =========================
+        // CUSTOMER BINDINGS
+        // =========================
+        $this->app->bind(CustomerOrderRepoInterface::class, CustomerOrderRepository::class);
+        $this->app->bind(CustomerOrderService::class, CustomerOrderService::class);
 
         // Inventory, Coupons, Reviews, Reports
         $this->app->bind(InventoryRepositoryInterface::class, InventoryRepository::class);
@@ -122,16 +130,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SettingRepositoryInterface::class, SettingRepository::class);
         $this->app->bind(ActivityLogRepositoryInterface::class, ActivityLogRepository::class);
 
-
         // =========================
         // FRONTEND BINDINGS (ALIAS SAFE)
         // =========================
-
         $this->app->bind(FrontHomeRepoInterface::class, FrontHomeRepository::class);
         $this->app->bind(FrontProductRepoInterface::class, FrontProductRepository::class);
         $this->app->bind(FrontCategoryRepoInterface::class, FrontCategoryRepository::class);
         $this->app->bind(FrontVendorRepoInterface::class, FrontVendorRepository::class);
-
         $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
         $this->app->bind(WishlistRepositoryInterface::class, WishlistRepository::class);
         $this->app->bind(FrontPageRepoInterface::class, FrontPageRepository::class);

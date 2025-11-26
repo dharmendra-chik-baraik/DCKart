@@ -123,4 +123,14 @@ class User extends Authenticatable
     {
         return $this->notifications()->whereNull('read_at');
     }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('is_default', true);
+    }
+
+        public function productReviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 }

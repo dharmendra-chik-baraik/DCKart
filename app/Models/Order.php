@@ -16,7 +16,17 @@ class Order extends BaseModel
     protected $fillable = [
         'order_number', 'user_id', 'vendor_id', 'total_amount', 'discount',
         'shipping_charge', 'tax', 'grand_total', 'payment_status', 'order_status',
-        'shipping_method', 'payment_method', 'transaction_id'
+        'shipping_method', 'payment_method', 'transaction_id', 'shipping_address_id'
+    ];
+
+    protected $casts = [
+        'total_amount' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'shipping_charge' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'grand_total' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Relationships
@@ -45,6 +55,38 @@ class Order extends BaseModel
         return $this->hasOne(Payment::class);
     }
 
+    public function shippingAddress()
+    {
+        return $this->belongsTo(UserAddress::class, 'shipping_address_id');
+    }
+
+    // Accessors for compatibility with blade template
+    public function getSubtotalAttribute()
+    {
+        return $this->total_amount;
+    }
+
+    public function getShippingCostAttribute()
+    {
+        return $this->shipping_charge;
+    }
+
+    public function getTaxAmountAttribute()
+    {
+        return $this->tax;
+    }
+
+    public function getDiscountAmountAttribute()
+    {
+        return $this->discount;
+    }
+
+    // Get default shipping address from user
+    public function getDefaultShippingAddressAttribute()
+    {
+        return $this->user->addresses()->where('is_default', true)->first();
+    }
+
     // Scopes
     public function scopePending($query)
     {
@@ -62,8 +104,22 @@ class Order extends BaseModel
     }
 
     // Methods
-    public function canBeCancelled()
+    public function canBeCancelled(): bool
     {
         return in_array($this->order_status, ['pending', 'confirmed']);
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        $colors = [
+            'pending' => 'warning',
+            'confirmed' => 'info',
+            'processing' => 'primary',
+            'shipped' => 'info',
+            'delivered' => 'success',
+            'cancelled' => 'danger'
+        ];
+
+        return $colors[$this->order_status] ?? 'secondary';
     }
 }

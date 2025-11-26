@@ -54,7 +54,6 @@ class Product extends BaseModel
     {
         return $this->hasMany(ProductReview::class);
     }
-
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);

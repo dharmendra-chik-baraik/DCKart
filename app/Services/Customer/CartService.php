@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\Frontend;
+namespace App\Services\Customer;
 
-use App\Interfaces\Frontend\CartRepositoryInterface;
+use App\Interfaces\Customer\CartRepositoryInterface;
 use App\Models\Product;
 use App\Models\ProductVariantValue;
 use Illuminate\Support\Facades\Auth;

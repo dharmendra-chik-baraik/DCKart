@@ -14,11 +14,12 @@ class OrderStatusLog extends BaseModel
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'order_id', 'status', 'changed_by', 'note'
+        'id', 'order_id', 'status', 'changed_by', 'note'
     ];
     
     protected $casts = [
         'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Relationships

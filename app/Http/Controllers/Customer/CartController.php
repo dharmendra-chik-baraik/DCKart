@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Frontend;
+namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Services\Frontend\CartService;
+use App\Services\Customer\CartService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller

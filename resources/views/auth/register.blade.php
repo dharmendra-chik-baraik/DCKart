@@ -4,24 +4,30 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
+    <div class="dc-login my-5 d-flex justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <div class="card shadow">
+            <div class="card shadow-sm border">
                 <div class="card-header bg-primary text-white text-center py-4">
                     <h3 class="mb-0">Create Account</h3>
-                    <p class="mb-0 opacity-75">Join our multi-vendor platform</p>
+                    <p class="mb-0 opacity-75">Join our platform today</p>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="#">
+                    <form method="POST" action="{{ route('register') }}">
                         @csrf
 
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Register As</label>
-                            <select id="role" name="role" class="form-select" required>
-                                <option value="customer">Customer</option>
-                                <option value="vendor">Vendor</option>
-                            </select>
-                        </div>
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
@@ -42,6 +48,15 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                   id="phone" name="phone" value="{{ old('phone') }}" required>
+                            @error('phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control @error('password') is-invalid @enderror" 
                                    id="password" name="password" required>
@@ -56,30 +71,20 @@
                                    id="password_confirmation" name="password_confirmation" required>
                         </div>
 
-                        <!-- Vendor Specific Fields -->
-                        <div id="vendor-fields" class="mb-3" style="display: none;">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="shop_name" class="form-label">Shop Name</label>
-                                        <input type="text" class="form-control" id="shop_name" name="shop_name">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="phone" class="form-label">Phone</label>
-                                        <input type="text" class="form-control" id="phone" name="phone">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="address" class="form-label">Address</label>
-                                <textarea class="form-control" id="address" name="address" rows="3"></textarea>
-                            </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input @error('agree_terms') is-invalid @enderror" 
+                                   id="agree_terms" name="agree_terms" value="1" {{ old('agree_terms') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="agree_terms">
+                                I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a>
+                            </label>
+                            @error('agree_terms')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="#" class="text-decoration-none">Already registered?</a>
+                            <a href="{{ route('login') }}" class="text-decoration-none">Already have an account?</a>
+                            <a href="{{ route('vendor.register') }}" class="text-decoration-none">Register as Vendor</a>
                             <button type="submit" class="btn btn-primary">Register</button>
                         </div>
                     </form>
@@ -88,15 +93,15 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.getElementById('role').addEventListener('change', function() {
-        const vendorFields = document.getElementById('vendor-fields');
-        if (this.value === 'vendor') {
-            vendorFields.style.display = 'block';
-        } else {
-            vendorFields.style.display = 'none';
-        }
-    });
-</script>
 @endsection
+
+@push('styles')
+<style>
+.dc-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 75vh;
+}
+</style>
+@endpush
